@@ -8,7 +8,7 @@ const user = tg.initDataUnsafe.user || {
 };
 
 // ⚠️ сюда потом вставишь URL своего Render backend
-const WS_URL = "wss://YOUR-BACKEND.onrender.com";
+const WS_URL = "wss://telegram-wheel-backend.onrender.com";
 
 const ws = new WebSocket(WS_URL);
 
