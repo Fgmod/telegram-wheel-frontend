@@ -17,9 +17,9 @@ body{
 
 .logo{
   font-weight:900;
-  font-size:26px;
+  font-size:24px;
   color:#2fff9d;
-  letter-spacing:3px;
+  letter-spacing:2px;
 }
 
 .balance{
@@ -55,40 +55,35 @@ body{
 }
 
 .bank{
-  font-size:28px;
+  font-size:26px;
   color:#ffd54a;
   font-weight:800;
   margin-top:4px;
 }
 
 #wheel{
-  width:320px;
-  height:320px;
+  width:300px;
+  height:300px;
   margin:25px auto;
   border-radius:50%;
   border:10px solid #2fff9d;
+  background:
+   conic-gradient(
+    #2fff9d 0 35%,
+    #ff4d4d 35% 55%,
+    #4d7cff 55% 75%,
+    #ffd54a 75% 100%
+   );
   box-shadow: 0 0 35px #2fff9d55;
-  position:relative;
-  transition: transform 6s cubic-bezier(.15,.85,.25,1);
 }
 
-.label{
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform-origin:0 0;
-  font-size:13px;
-  font-weight:800;
-  color:#0b0e17;
-  text-shadow:0 0 3px #ffffffaa;
-  white-space:nowrap;
+.spin{
+  animation: spin 6s cubic-bezier(.15,.85,.25,1) forwards;
 }
 
-.bank-under{
-  margin-top:5px;
-  font-size:20px;
-  color:#ffd54a;
-  font-weight:800;
+@keyframes spin{
+  from{transform:rotate(0)}
+  to{transform:rotate(1800deg)}
 }
 
 button{
