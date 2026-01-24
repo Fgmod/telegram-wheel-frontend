@@ -7,14 +7,10 @@ const user = tg.initDataUnsafe.user || {
   first_name: "Developer"
 };
 
-// ⚠️ сюда потом вставишь URL своего Render backend
-const WS_URL = "wss://telegram-wheel-backend.onrender.com";
-
-const ws = new WebSocket(WS_URL);
+const ws = new WebSocket("wss://YOUR-BACKEND.onrender.com");
 
 const screens = {
   main: document.getElementById("screen-main"),
-  lobby: document.getElementById("screen-lobby"),
   wheel: document.getElementById("screen-wheel"),
   win: document.getElementById("screen-win"),
   lose: document.getElementById("screen-lose")
@@ -25,44 +21,52 @@ function show(name){
   screens[name].classList.remove("hidden");
 }
 
-document.getElementById("joinBtn").onclick = () => {
-  ws.send(JSON.stringify({
-    type:"join",
-    id:user.id,
-    name:user.first_name
-  }));
-  show("lobby");
+ws.onopen = () =>{
+  ws.send(JSON.stringify({type:"join", id:user.id, name:user.first_name}));
 };
 
-document.getElementById("startBtn").onclick = () => {
+document.getElementById("betBtn").onclick = ()=>{
+  const amount = document.getElementById("betAmount").value;
+  ws.send(JSON.stringify({type:"bet", id:user.id, amount}));
+};
+
+document.getElementById("startBtn").onclick = ()=>{
   ws.send(JSON.stringify({type:"start"}));
 };
 
-ws.onmessage = (event) => {
+ws.onmessage = (event)=>{
   const data = JSON.parse(event.data);
 
-  if(data.type === "players"){
+  if(data.type==="state"){
+    document.getElementById("bank").innerText = data.totalBank;
+
+    const me = data.players.find(p=>p.id==user.id);
+    if(me) document.getElementById("balance").innerText = me.balance;
+
     document.getElementById("players").innerHTML =
-      data.players.map(p=>`<div>👤 ${p.name}</div>`).join("");
+      data.players.map(p=>`
+        <div class="player-card">
+          👤 ${p.name} — 💰 ${p.bet} — 🎯 ${p.chance}%
+        </div>`).join("");
   }
 
-  if(data.type === "round_start"){
+  if(data.type==="round_start"){
     show("wheel");
     document.getElementById("wheel").classList.add("spin");
-
     let t = data.time;
-    const timerEl = document.getElementById("timer");
-    timerEl.innerText = "До выбора победителя: "+t;
-
-    const interval = setInterval(()=>{
+    const timer = document.getElementById("timer");
+    const int = setInterval(()=>{
+      timer.innerText = "Осталось: "+t;
       t--;
-      timerEl.innerText = "До выбора победителя: "+t;
-      if(t<=0) clearInterval(interval);
+      if(t<0) clearInterval(int);
     },1000);
   }
 
-  if(data.type === "round_end"){
-    if(data.winnerId == user.id) show("win");
-    else show("lose");
+  if(data.type==="round_end"){
+    if(data.winnerId == user.id){
+      document.getElementById("winAmount").innerText =
+        "Вы выиграли: "+data.winAmount;
+      show("win");
+    } else show("lose");
   }
 };
