@@ -7,7 +7,7 @@ const user = tg.initDataUnsafe.user || {
   first_name: "Developer"
 };
 
-const ws = new WebSocket("wss://YOUR-BACKEND.onrender.com");
+const ws = new WebSocket("wss://fgmod.github.io/telegram-wheel-backend/");
 
 const screens = {
   main: document.getElementById("screen-main"),
