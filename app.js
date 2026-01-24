@@ -7,7 +7,7 @@ const user = tg.initDataUnsafe.user || {
   first_name: "Player"
 };
 
-const ws = new WebSocket("wss://telegram-wheel-backend.onrender.com");
+const ws = new WebSocket("wss://YOUR-BACKEND.onrender.com");
 
 const screens = {
   main: document.getElementById("screen-main"),
@@ -25,6 +25,7 @@ ws.onopen = ()=>{
   ws.send(JSON.stringify({type:"join", id:user.id, name:user.first_name}));
 };
 
+// кнопки ставок
 document.getElementById("betBtn").onclick = ()=>{
   const amount = document.getElementById("betAmount").value;
   ws.send(JSON.stringify({type:"bet", id:user.id, amount}));
@@ -32,6 +33,15 @@ document.getElementById("betBtn").onclick = ()=>{
 
 document.getElementById("startBtn").onclick = ()=>{
   ws.send(JSON.stringify({type:"start"}));
+};
+
+// кнопки возврата в лобби
+document.getElementById("backBtnWin").onclick = ()=>{
+  show("main");
+};
+
+document.getElementById("backBtnLose").onclick = ()=>{
+  show("main");
 };
 
 ws.onmessage = (event)=>{
@@ -43,7 +53,6 @@ ws.onmessage = (event)=>{
     const me = data.players.find(p=>p.id==user.id);
     if(me) document.getElementById("balance").innerText = me.balance;
 
-    // верхняя прокрутка игроков
     document.getElementById("playersStrip").innerHTML =
       data.players.map(p=>`
         <div class="player-chip">
@@ -62,7 +71,7 @@ ws.onmessage = (event)=>{
     let t = data.time;
     const timer = document.getElementById("timer");
     const int = setInterval(()=>{
-      timer.innerText = "Ожидание результата: "+t;
+      timer.innerText = "Результат через: "+t;
       t--;
       if(t<0) clearInterval(int);
     },1000);
