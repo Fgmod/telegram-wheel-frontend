@@ -1,37 +1,73 @@
-body {
+body{
   margin:0;
-  font-family: Arial, sans-serif;
-  background:#111;
+  background:#0e0f14;
   color:white;
+  font-family:Inter, Arial;
   text-align:center;
 }
 
-.screen { padding-top:40px; }
-.hidden { display:none; }
+.screen{padding:20px;}
+.hidden{display:none;}
 
-button {
-  padding:12px 20px;
+.topbar{
+  background:#1a1c25;
+  padding:10px;
+  border-radius:12px;
+  margin-bottom:15px;
+}
+
+.balance{
+  font-weight:bold;
+  color:#2fff9d;
+}
+
+.bank{
+  color:#ffd54a;
+}
+
+#wheel{
+  width:260px;
+  height:260px;
+  margin:20px auto;
+  border-radius:50%;
+  border:8px solid #2fff9d;
+  background:
+   conic-gradient(
+    #2fff9d 0 40%,
+    #ff4d4d 40% 60%,
+    #4d7cff 60% 80%,
+    #ffd54a 80% 100%
+   );
+}
+
+.spin{
+  animation: spin 5s cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+@keyframes spin{
+  from{transform:rotate(0)}
+  to{transform:rotate(1440deg)}
+}
+
+input{
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  width:120px;
+  text-align:center;
+}
+
+button{
+  padding:10px 16px;
   border:none;
   border-radius:8px;
   background:#2ea6ff;
   color:white;
-  font-size:16px;
+  font-weight:bold;
 }
-
-#wheel {
-  width:220px;
-  height:220px;
-  margin:20px auto;
-  border-radius:50%;
-  border:10px solid gold;
-  background: conic-gradient(#ff3,#f33,#3f3,#33f,#ff3);
-}
-
-.spin {
-  animation: spin 5s cubic-bezier(.2,.8,.2,1) forwards;
-}
-
-@keyframes spin {
-  from { transform:rotate(0deg); }
-  to   { transform:rotate(1440deg); }
+.player-card{
+  background:#1a1c25;
+  margin:6px;
+  padding:8px;
+  border-radius:8px;
 }
