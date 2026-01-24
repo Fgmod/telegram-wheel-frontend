@@ -16,7 +16,6 @@
 
 <!-- ЛОББИ -->
 <div id="screen-main" class="center">
-  <div>🏦 Банк раунда</div>
   <div class="bank-title">Банк раунда</div>
   <div id="bank" class="bank">0</div>
 
@@ -24,8 +23,6 @@
   <input id="betAmount" placeholder="Ставка">
   <br><br>
   <button id="betBtn">Сделать ставку</button>
-  <br><br>
-  <button id="startBtn">Запустить</button>
   <br>
   <button id="startBtn">Запустить раунд</button>
 </div>
@@ -33,12 +30,16 @@
 <!-- КОЛЕСО -->
 <div id="screen-wheel" class="center hidden">
   <div id="wheel"></div>
+
+  <div class="bank-under">
+    Банк: <span id="bankWheel">0</span>
+  </div>
+
   <div id="timer"></div>
 </div>
 
 <!-- ПОБЕДА -->
 <div id="screen-win" class="center hidden">
-  <h2>🎉 Победа</h2>
   <h2>🎉 Победа!</h2>
   <div id="winAmount"></div>
   <br>
@@ -53,8 +54,8 @@
 </div>
 
 <div class="footer">SPINS</div>
-@@ -45,4 +55,5 @@ <h2>😢 Проигрыш</h2>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="app.js"></script>
 </body>
-
 </html>
