@@ -2,46 +2,44 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Wheel Game</title>
+<title>SPINS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="app">
-
 <div class="topbar">
-  💰 Баланс: <span id="balance" class="balance">0</span> |
-  🏦 Банк: <span id="bank" class="bank">0</span>
+  <div class="logo">SPINS</div>
+  <div>💰 <span id="balance" class="balance">0</span></div>
 </div>
 
-<div id="screen-main" class="screen">
-  <h2>🎰 Wheel Game</h2>
+<div class="players-strip" id="playersStrip"></div>
+
+<div id="screen-main" class="center">
+  <div>🏦 Банк раунда</div>
+  <div id="bank" class="bank">0</div>
+  <br>
   <input id="betAmount" placeholder="Ставка">
+  <br><br>
   <button id="betBtn">Сделать ставку</button>
   <br><br>
-  <button id="startBtn">Запустить раунд</button>
-  <h3>Игроки</h3>
-  <div id="players"></div>
+  <button id="startBtn">Запустить</button>
 </div>
 
-<div id="screen-wheel" class="screen hidden">
-  <h3>Крутится колесо...</h3>
+<div id="screen-wheel" class="center hidden">
   <div id="wheel"></div>
   <div id="timer"></div>
 </div>
 
-<div id="screen-win" class="screen hidden">
-  <h2>🎉 Победа!</h2>
+<div id="screen-win" class="center hidden">
+  <h2>🎉 Победа</h2>
   <div id="winAmount"></div>
-  <button onclick="location.reload()">Ок</button>
 </div>
 
-<div id="screen-lose" class="screen hidden">
+<div id="screen-lose" class="center hidden">
   <h2>😢 Проигрыш</h2>
-  <button onclick="location.reload()">Ок</button>
 </div>
 
-</div>
+<div class="footer">SPINS</div>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="app.js"></script>
