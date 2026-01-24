@@ -1,5 +1,6 @@
 body{
   margin:0;
+  background: radial-gradient(circle at top, #1b1f2e, #0b0e17);
   background: radial-gradient(circle at top, #1b1f2e, #0a0c14);
   color:white;
   font-family: Inter, Arial;
@@ -8,6 +9,7 @@ body{
 .hidden{display:none;}
 
 .topbar{
+  padding:15px;
   padding:18px 20px;
   display:flex;
   justify-content:space-between;
@@ -16,27 +18,35 @@ body{
 }
 
 .logo{
+  font-weight:800;
+  font-size:20px;
   font-weight:900;
-  font-size:26px;
+  font-size:24px;
   color:#2fff9d;
-  letter-spacing:3px;
+  letter-spacing:2px;
 }
 
 .balance{
   font-size:18px;
   color:#ffd54a;
+  font-weight:600;
   font-weight:700;
 }
 
 .players-strip{
   display:flex;
   overflow-x:auto;
+  padding:10px;
+  gap:8px;
   padding:12px;
   gap:10px;
 }
 
 .player-chip{
   background:#1a1f2e;
+  padding:6px 10px;
+  border-radius:12px;
+  font-size:13px;
   padding:8px 14px;
   border-radius:14px;
   font-size:14px;
@@ -46,6 +56,7 @@ body{
 
 .center{
   text-align:center;
+  margin-top:15px;
   margin-top:20px;
 }
 
@@ -55,73 +66,74 @@ body{
 }
 
 .bank{
-  font-size:28px;
+  font-size:26px;
   color:#ffd54a;
   font-weight:800;
   margin-top:4px;
 }
 
 #wheel{
-  width:320px;
-  height:320px;
+  width:260px;
+  height:260px;
+  margin:20px auto;
+  width:300px;
+  height:300px;
   margin:25px auto;
   border-radius:50%;
+  border:8px solid #2fff9d;
   border:10px solid #2fff9d;
+  background:
+   conic-gradient(
+    #2fff9d 0 35%,
+    #ff4d4d 35% 55%,
+    #4d7cff 55% 75%,
+    #ffd54a 75% 100%
+   );
+  box-shadow: 0 0 25px #2fff9d55;
   box-shadow: 0 0 35px #2fff9d55;
-  position:relative;
-  transition: transform 6s cubic-bezier(.15,.85,.25,1);
 }
 
-.label{
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform-origin:0 0;
-  font-size:13px;
-  font-weight:800;
-  color:#0b0e17;
-  text-shadow:0 0 3px #ffffffaa;
-  white-space:nowrap;
-}
-
-.bank-under{
-  margin-top:5px;
-  font-size:20px;
-  color:#ffd54a;
-  font-weight:800;
-}
-
+.spin{
+@@ -74,27 +89,24 @@ body{
 button{
   background:linear-gradient(90deg,#2fff9d,#2ea6ff);
   border:none;
+  padding:12px 20px;
+  border-radius:12px;
+  font-weight:700;
   padding:14px 26px;
   border-radius:14px;
   font-weight:800;
   font-size:15px;
   color:#0b0e17;
+  box-shadow:0 4px 15px #2fff9d55;
   box-shadow:0 6px 18px #2fff9d55;
   margin:6px;
 }
 
 input{
+  padding:10px;
+  border-radius:10px;
   padding:12px;
   border-radius:12px;
   border:none;
   text-align:center;
+  width:120px;
   width:140px;
   background:#1a1f2e;
   color:white;
+}
+
+.bank{
+  font-size:18px;
+  color:#ffd54a;
+  font-weight:700;
   font-size:15px;
 }
 
 .footer{
-  position:fixed;
-  bottom:8px;
-  width:100%;
-  text-align:center;
-  font-size:11px;
+@@ -106,4 +118,5 @@ input{
   color:#2fff9d;
   opacity:0.6;
   font-weight:700;
   letter-spacing:2px;
-}
