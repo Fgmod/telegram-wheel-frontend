@@ -1,28 +1,49 @@
 body{
   margin:0;
-  background:#0e0f14;
+  background: radial-gradient(circle at top, #1b1f2e, #0b0e17);
   color:white;
-  font-family:Inter, Arial;
-  text-align:center;
+  font-family: Inter, Arial;
 }
 
-.screen{padding:20px;}
 .hidden{display:none;}
 
 .topbar{
-  background:#1a1c25;
-  padding:10px;
-  border-radius:12px;
-  margin-bottom:15px;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  background:#121420;
+  border-bottom:1px solid #1f2333;
 }
 
-.balance{
-  font-weight:bold;
+.logo{
+  font-weight:800;
+  font-size:20px;
   color:#2fff9d;
 }
 
-.bank{
+.balance{
   color:#ffd54a;
+  font-weight:600;
+}
+
+.players-strip{
+  display:flex;
+  overflow-x:auto;
+  padding:10px;
+  gap:8px;
+}
+
+.player-chip{
+  background:#1a1f2e;
+  padding:6px 10px;
+  border-radius:12px;
+  font-size:13px;
+  white-space:nowrap;
+}
+
+.center{
+  text-align:center;
+  margin-top:15px;
 }
 
 #wheel{
@@ -33,41 +54,56 @@ body{
   border:8px solid #2fff9d;
   background:
    conic-gradient(
-    #2fff9d 0 40%,
-    #ff4d4d 40% 60%,
-    #4d7cff 60% 80%,
-    #ffd54a 80% 100%
+    #2fff9d 0 35%,
+    #ff4d4d 35% 55%,
+    #4d7cff 55% 75%,
+    #ffd54a 75% 100%
    );
+  box-shadow: 0 0 25px #2fff9d55;
 }
 
 .spin{
-  animation: spin 5s cubic-bezier(.2,.8,.2,1) forwards;
+  animation: spin 6s cubic-bezier(.15,.85,.25,1) forwards;
 }
 
 @keyframes spin{
   from{transform:rotate(0)}
-  to{transform:rotate(1440deg)}
+  to{transform:rotate(1800deg)}
+}
+
+button{
+  background:linear-gradient(90deg,#2fff9d,#2ea6ff);
+  border:none;
+  padding:12px 20px;
+  border-radius:12px;
+  font-weight:700;
+  color:#0b0e17;
+  box-shadow:0 4px 15px #2fff9d55;
 }
 
 input{
   padding:10px;
-  border-radius:8px;
+  border-radius:10px;
   border:none;
-  width:120px;
   text-align:center;
+  width:120px;
+  background:#1a1f2e;
+  color:white;
 }
 
-button{
-  padding:10px 16px;
-  border:none;
-  border-radius:8px;
-  background:#2ea6ff;
-  color:white;
-  font-weight:bold;
+.bank{
+  font-size:18px;
+  color:#ffd54a;
+  font-weight:700;
 }
-.player-card{
-  background:#1a1c25;
-  margin:6px;
-  padding:8px;
-  border-radius:8px;
+
+.footer{
+  position:fixed;
+  bottom:8px;
+  width:100%;
+  text-align:center;
+  font-size:11px;
+  color:#2fff9d;
+  opacity:0.6;
+  font-weight:700;
 }
