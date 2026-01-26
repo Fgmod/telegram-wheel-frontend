@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - SPINS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0c14;
+            color: white;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(18, 20, 32, 0.9);
+            border-radius: 15px;
+            border: 2px solid #2fff9d33;
+        }
+        
+        h1 {
+            color: #2fff9d;
+            margin-bottom: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(26, 31, 46, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #2fff9d33;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 900;
+            color: #ffd54a;
+            margin: 10px 0;
+        }
+        
+        table {
+            width: 100%;
+            background: rgba(26, 31, 46, 0.9);
+            border-radius: 15px;
+            overflow: hidden;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #2fff9d33;
+        }
+        
+        th {
+            background: rgba(47, 255, 157, 0.1);
+            color: #2fff9d;
+        }
+        
+        .action-btn {
+            background: #2fff9d;
+            color: #0b0e17;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        
+        .action-btn.delete {
+            background: #ff4d4d;
+            color: white;
+        }
+        
+        .control-panel {
+            background: rgba(26, 31, 46, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border: 2px solid #2fff9d33;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #2fff9d33;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin: 10px 0;
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #2fff9d, #2ea6ff);
+            border: none;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: #0b0e17;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            background: #2fff9d;
+            color: #0b0e17;
+            font-weight: 600;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>👑 Панель администратора SPINS</h1>
+            <p>Управление игрой и игроками</p>
+        </header>
+        
+        <div class="stats-grid" id="statsGrid">
+            <!-- Статистика будет загружена через JS -->
+        </div>
+        
+        <div class="control-panel">
+            <h2>Управление игроками</h2>
+            
+            <div class="control-group">
+                <h3>Добавить баланс игроку</h3>
+                <input type="text" id="adminPlayerId" placeholder="ID игрока">
+                <input type="number" id="adminAmount" placeholder="Сумма" value="1000">
+                <button class="btn" onclick="addBalance()">Добавить баланс</button>
+            </div>
+            
+            <div class="control-group">
+                <h3>Сброс игры</h3>
+                <button class="btn" onclick="resetGame()">Сбросить все балансы</button>
+                <button class="btn delete" onclick="clearStats()">Очистить статистику</button>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <h2>Список игроков</h2>
+            <table id="playersTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Имя</th>
+                        <th>Баланс</th>
+                        <th>Статистика</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="playersTableBody">
+                    <!-- Данные будут загружены через JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000/admin/api'
+            : 'https://telegram-wheel-backend.onrender.com/admin/api';
+        
+        const ADMIN_TOKEN = 'ADMIN_SECRET_TOKEN'; // Замените на реальный токен
+        
+        async function adminRequest(command, data = {}) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token: ADMIN_TOKEN,
+                        command,
+                        data
+                    })
+                });
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Admin request error:', error);
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function loadStats() {
+            const result = await adminRequest('get_stats');
+            if (result.success) {
+                updateStatsUI(result.stats, result.players);
+            }
+        }
+        
+        function updateStatsUI(stats, players) {
+            // Обновление общей статистики
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card">
+                    <div>Всего раундов</div>
+                    <div class="stat-value">${stats.totalRounds}</div>
+                </div>
+                <div class="stat-card">
+                    <div>Всего побед</div>
+                    <div class="stat-value">${stats.totalWins}</div>
+                </div>
+                <div class="stat-card">
+                    <div>Всего проигрышей</div>
+                    <div class="stat-value">${stats.totalLosses}</div>
+                </div>
+                <div class="stat-card">
+                    <div>Активных игроков</div>
+                    <div class="stat-value">${players.length}</div>
+                </div>
+            `;
+            
+            // Обновление таблицы игроков
+            const tableBody = document.getElementById('playersTableBody');
+            tableBody.innerHTML = players.map(player => `
+                <tr>
+                    <td>${player.id}</td>
+                    <td>${player.name}</td>
+                    <td>${player.balance}</td>
+                    <td>${player.wins}W / ${player.losses}L</td>
+                    <td>
+                        <button class="action-btn" onclick="addPlayerBalance('${player.id}', 1000)">
+                            +1000
+                        </button>
+                        <button class="action-btn" onclick="addPlayerBalance('${player.id}', 5000)">
+                            +5000
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function addBalance() {
+            const playerId = document.getElementById('adminPlayerId').value;
+            const amount = parseInt(document.getElementById('adminAmount').value);
+            
+            if (playerId && amount > 0) {
+                const result = await adminRequest('add_balance', {
+                    userId: playerId,
+                    amount
+                });
+                
+                if (result.success) {
+                    showNotification(`Баланс игрока ${playerId} пополнен на ${amount}`);
+                    loadStats();
+                } else {
+                    showNotification(`Ошибка: ${result.error}`, 'error');
+                }
+            }
+        }
+        
+        async function addPlayerBalance(playerId, amount) {
+            const result = await adminRequest('add_balance', {
+                userId: playerId,
+                amount
+            });
+            
+            if (result.success) {
+                showNotification(`Баланс игрока ${playerId} пополнен на ${amount}`);
+                loadStats();
+            }
+        }
+        
+        async function resetGame() {
+            if (confirm('Вы уверены, что хотите сбросить все балансы?')) {
+                const result = await adminRequest('reset_game');
+                if (result.success) {
+                    showNotification('Игра сброшена');
+                    loadStats();
+                }
+            }
+        }
+        
+        async function clearStats() {
+            if (confirm('Очистить всю статистику?')) {
+                // Здесь можно добавить логику очистки статистики
+                showNotification('Функция в разработке');
+            }
+        }
+        
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            notification.style.background = type === 'error' ? '#ff4d4d' : '#2fff9d';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // Загружаем статистику при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadStats);
+        
+        // Автоматическое обновление каждые 30 секунд
+        setInterval(loadStats, 30000);
+    </script>
+</body>
+</html>
