@@ -1,57 +1,172 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>SPINS</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPINS</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Верхняя панель -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="logo">🎰 SPINS</div>
+            <div class="game-mode" id="gameMode">🤖 С ботами</div>
+        </div>
+        <div class="topbar-right">
+            <div class="balance-container">
+                <div class="balance-label">Баланс</div>
+                <div class="balance">💰 <span id="balance">0</span></div>
+            </div>
+            <button class="btn-icon" id="adminBtn" style="display:none;">👑</button>
+        </div>
+    </div>
 
-<div class="topbar">
-  <div class="logo">SPINS</div>
-  <div>💰 <span id="balance" class="balance">0</span></div>
-</div>
+    <!-- Выбор режима игры -->
+    <div id="screen-mode" class="center">
+        <h2 class="screen-title">Выберите режим игры</h2>
+        <div class="mode-selector">
+            <div class="mode-option active" data-mode="bots">
+                <div class="mode-icon">🤖</div>
+                <div class="mode-title">С ботами</div>
+                <div class="mode-desc">Играйте против ИИ</div>
+            </div>
+            <div class="mode-option" data-mode="pvp">
+                <div class="mode-icon">👥</div>
+                <div class="mode-title">PvP Лобби</div>
+                <div class="mode-desc">Играйте с другими игроками</div>
+            </div>
+        </div>
+        <button id="confirmModeBtn" class="btn-primary">Продолжить</button>
+    </div>
 
-<div class="players-strip" id="playersStrip"></div>
+    <!-- Основной экран -->
+    <div id="screen-main" class="center hidden">
+        <!-- Банк раунда -->
+        <div class="bank-card">
+            <div class="bank-header">
+                <div class="bank-title">Банк раунда</div>
+                <div class="bank-timer" id="bankTimer">--:--</div>
+            </div>
+            <div id="bank" class="bank-amount">0</div>
+            
+            <!-- Статистика игроков -->
+            <div class="players-grid" id="playersGrid"></div>
+        </div>
 
-<!-- ЛОББИ -->
-<div id="screen-main" class="center">
-  <div class="bank-title">Банк раунда</div>
-  <div id="bank" class="bank">0</div>
+        <!-- Панель ставок -->
+        <div class="bet-panel">
+            <div class="bet-controls">
+                <div class="bet-amount-display" id="betAmountDisplay">0</div>
+                <div class="bet-buttons">
+                    <button class="bet-btn" data-amount="10">10</button>
+                    <button class="bet-btn" data-amount="50">50</button>
+                    <button class="bet-btn" data-amount="100">100</button>
+                    <button class="bet-btn" data-amount="500">500</button>
+                </div>
+                <input type="range" id="betSlider" min="0" max="1000" value="0" class="bet-slider">
+            </div>
+            <button id="placeBetBtn" class="btn-bet">Сделать ставку</button>
+            <button id="startRoundBtn" class="btn-start" disabled>Запустить раунд</button>
+        </div>
 
-  <br>
-  <input id="betAmount" placeholder="Ставка">
-  <br><br>
-  <button id="betBtn">Сделать ставку</button>
-  <br>
-  <button id="startBtn">Запустить раунд</button>
-</div>
+        <!-- Кнопка смены режима -->
+        <button id="changeModeBtn" class="btn-secondary">Сменить режим</button>
+    </div>
 
-<!-- КОЛЕСО -->
-<div id="screen-wheel" class="center hidden">
-  <div id="wheel"></div>
-  <div id="timer"></div>
-</div>
+    <!-- Колесо фортуны -->
+    <div id="screen-wheel" class="center hidden">
+        <div class="wheel-container">
+            <div class="wheel-arrow">▼</div>
+            <div id="wheel" class="wheel">
+                <!-- Сектора будут созданы динамически -->
+            </div>
+            <div class="wheel-timer" id="wheelTimer">00:06</div>
+        </div>
+        <div class="current-bets" id="currentBets"></div>
+    </div>
 
-<!-- ПОБЕДА -->
-<div id="screen-win" class="center hidden">
-  <h2>🎉 Победа!</h2>
-  <div id="winAmount"></div>
-  <br>
-  <button id="backBtnWin">Вернуться в лобби</button>
-</div>
+    <!-- Экран победы -->
+    <div id="screen-win" class="center hidden">
+        <div class="result-card win">
+            <div class="result-icon">🎉</div>
+            <h2>ПОБЕДА!</h2>
+            <div class="win-amount" id="winAmount">+0</div>
+            <div class="result-stats">
+                <div>Ваш баланс: <span id="newBalance">0</span></div>
+            </div>
+            <button id="playAgainBtn" class="btn-primary">Играть снова</button>
+        </div>
+    </div>
 
-<!-- ПРОИГРЫШ -->
-<div id="screen-lose" class="center hidden">
-  <h2>😢 Проигрыш</h2>
-  <br>
-  <button id="backBtnLose">Вернуться в лобби</button>
-</div>
+    <!-- Экран проигрыша -->
+    <div id="screen-lose" class="center hidden">
+        <div class="result-card lose">
+            <div class="result-icon">😢</div>
+            <h2>ПРОИГРЫШ</h2>
+            <div class="lose-text">Повезёт в следующий раз!</div>
+            <div class="result-stats">
+                <div>Остаток баланса: <span id="loseBalance">0</span></div>
+            </div>
+            <button id="tryAgainBtn" class="btn-primary">Попробовать снова</button>
+            <button id="supportBtn" class="btn-secondary">Написать админу</button>
+        </div>
+    </div>
 
-<div class="footer">SPINS</div>
+    <!-- Админ панель -->
+    <div id="screen-admin" class="center hidden">
+        <div class="admin-panel">
+            <h2>👑 Админ панель</h2>
+            <div class="admin-section">
+                <h3>Статистика</h3>
+                <div id="adminStats"></div>
+            </div>
+            <div class="admin-section">
+                <h3>Управление игроками</h3>
+                <div id="playerList"></div>
+                <div class="admin-controls">
+                    <input type="text" id="playerIdInput" placeholder="ID игрока">
+                    <input type="number" id="addAmountInput" placeholder="Сумма" value="1000">
+                    <button id="addBalanceBtn">Добавить баланс</button>
+                </div>
+            </div>
+            <button id="backFromAdminBtn" class="btn-secondary">Назад</button>
+        </div>
+    </div>
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="app.js"></script>
+    <!-- Нижняя панель -->
+    <div class="footer-nav">
+        <div class="nav-item active" data-screen="main">
+            <div class="nav-icon">🎮</div>
+            <div class="nav-label">Игра</div>
+        </div>
+        <div class="nav-item" data-screen="stats">
+            <div class="nav-icon">📊</div>
+            <div class="nav-label">Статистика</div>
+        </div>
+        <div class="nav-item" data-screen="support">
+            <div class="nav-icon">💬</div>
+            <div class="nav-label">Поддержка</div>
+        </div>
+        <div class="nav-item" data-screen="profile">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">Профиль</div>
+        </div>
+    </div>
+
+    <!-- Поддержка -->
+    <div id="screen-support" class="center hidden">
+        <div class="support-panel">
+            <h2>💬 Поддержка</h2>
+            <p>Если у вас закончилась валюта, напишите администратору:</p>
+            <textarea id="supportMessage" placeholder="Ваше сообщение..." rows="4"></textarea>
+            <button id="sendSupportBtn" class="btn-primary">Отправить</button>
+            <button id="backFromSupportBtn" class="btn-secondary">Назад</button>
+        </div>
+    </div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="app.js"></script>
 </body>
-
 </html>
