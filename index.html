@@ -3,170 +3,576 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SPINS</title>
+    <title>🎰 SPINS</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Верхняя панель -->
-    <div class="topbar">
-        <div class="topbar-left">
-            <div class="logo">🎰 SPINS</div>
-            <div class="game-mode" id="gameMode">🤖 С ботами</div>
-        </div>
-        <div class="topbar-right">
-            <div class="balance-container">
-                <div class="balance-label">Баланс</div>
-                <div class="balance">💰 <span id="balance">0</span></div>
-            </div>
-            <button class="btn-icon" id="adminBtn" style="display:none;">👑</button>
+    <!-- Загрузчик -->
+    <div id="loader" class="loader">
+        <div class="loader-content">
+            <div class="loader-wheel"></div>
+            <div class="loader-text">Загрузка игры...</div>
         </div>
     </div>
 
-    <!-- Выбор режима игры -->
-    <div id="screen-mode" class="center">
-        <h2 class="screen-title">Выберите режим игры</h2>
-        <div class="mode-selector">
-            <div class="mode-option active" data-mode="bots">
-                <div class="mode-icon">🤖</div>
-                <div class="mode-title">С ботами</div>
-                <div class="mode-desc">Играйте против ИИ</div>
+    <!-- Основной контейнер -->
+    <div id="app" class="app-container hidden">
+        <!-- Верхняя панель -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <div class="logo">
+                    <i class="fas fa-dharmachakra"></i> SPINS
+                </div>
+                <div class="game-mode-badge" id="gameModeBadge">
+                    <i class="fas fa-robot"></i> С ботами
+                </div>
             </div>
-            <div class="mode-option" data-mode="pvp">
-                <div class="mode-icon">👥</div>
-                <div class="mode-title">PvP Лобби</div>
-                <div class="mode-desc">Играйте с другими игроками</div>
+            <div class="topbar-right">
+                <button class="change-mode-btn" id="changeModeBtn">
+                    <i class="fas fa-exchange-alt"></i> Сменить
+                </button>
+                <div class="balance-container">
+                    <div class="balance-label">Баланс</div>
+                    <div class="balance">
+                        <i class="fas fa-coins"></i> <span id="balance">1,000</span>
+                    </div>
+                </div>
+                <button class="btn-icon" id="adminBtn" title="Админ панель" style="display: none;">
+                    <i class="fas fa-crown"></i>
+                </button>
             </div>
         </div>
-        <button id="confirmModeBtn" class="btn-primary">Продолжить</button>
-    </div>
 
-    <!-- Основной экран -->
-    <div id="screen-main" class="center hidden">
-        <!-- Банк раунда -->
-        <div class="bank-card">
-            <div class="bank-header">
-                <div class="bank-title">Банк раунда</div>
-                <div class="bank-timer" id="bankTimer">--:--</div>
+        <!-- Выбор режима -->
+        <div id="screen-mode" class="screen">
+            <div class="screen-content">
+                <h2 class="screen-title">
+                    <i class="fas fa-gamepad"></i> Выберите режим игры
+                </h2>
+                <p class="screen-subtitle">Как вы хотите играть?</p>
+                
+                <div class="mode-selector">
+                    <div class="mode-card active" data-mode="bots">
+                        <div class="mode-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="mode-content">
+                            <h3>🤖 С ботами</h3>
+                            <p>Играйте против искусственного интеллекта в любое время</p>
+                            <div class="mode-features">
+                                <div class="feature"><i class="fas fa-check"></i> Всегда доступно</div>
+                                <div class="feature"><i class="fas fa-check"></i> Быстрый старт</div>
+                                <div class="feature"><i class="fas fa-check"></i> Отработка стратегии</div>
+                            </div>
+                        </div>
+                        <div class="mode-select">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="mode-card" data-mode="pvp">
+                        <div class="mode-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="mode-content">
+                            <h3>👥 PvP Лобби</h3>
+                            <p>Соревнуйтесь с реальными игроками</p>
+                            <div class="mode-features">
+                                <div class="feature"><i class="fas fa-check"></i> Реальные противники</div>
+                                <div class="feature"><i class="fas fa-check"></i> Общий банк раунда</div>
+                                <div class="feature"><i class="fas fa-check"></i> Система готовности</div>
+                            </div>
+                        </div>
+                        <div class="mode-select">
+                            <i class="far fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="confirmModeBtn" class="btn-primary btn-large">
+                    <i class="fas fa-play"></i> Начать игру
+                </button>
+                
+                <div class="mode-info">
+                    <p><i class="fas fa-info-circle"></i> Вы можете сменить режим в любое время</p>
+                </div>
             </div>
-            <div id="bank" class="bank-amount">0</div>
+        </div>
+
+        <!-- Главный экран -->
+        <div id="screen-main" class="screen hidden">
+            <!-- Статистика раунда -->
+            <div class="round-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Банк раунда</div>
+                    <div class="stat-value" id="bank">0</div>
+                    <div class="stat-sub" id="bankTimer">--:--</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-label">Игроков</div>
+                    <div class="stat-value" id="playersCount">1</div>
+                    <div class="stat-sub">в лобби</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-label">Ваша ставка</div>
+                    <div class="stat-value" id="playerBet">0</div>
+                    <div class="stat-sub" id="playerChance">0%</div>
+                </div>
+            </div>
+
+            <!-- Секция PvP готовности -->
+            <div id="pvpReadySection" class="pvp-ready-section" style="display: none;">
+                <!-- Динамически заполняется -->
+            </div>
+
+            <!-- Игроки онлайн -->
+            <div class="players-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-users"></i> Участники раунда</h3>
+                    <div class="section-badge" id="lobbyType">Боты</div>
+                </div>
+                <div class="players-grid" id="playersGrid">
+                    <!-- Игроки загружаются динамически -->
+                </div>
+            </div>
+
+            <!-- Панель ставок -->
+            <div class="bet-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-money-bill-wave"></i> Ваша ставка</h3>
+                    <div class="current-bet" id="currentBetDisplay">0</div>
+                </div>
+                
+                <div class="bet-controls">
+                    <div class="bet-slider-container">
+                        <input type="range" 
+                               id="betSlider" 
+                               min="0" 
+                               max="1000" 
+                               value="0" 
+                               class="bet-slider">
+                        <div class="slider-labels">
+                            <span>0</span>
+                            <span>250</span>
+                            <span>500</span>
+                            <span>750</span>
+                            <span>1000</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bet-quick-actions">
+                        <button class="bet-quick-btn" data-action="min">MIN</button>
+                        <button class="bet-quick-btn" data-action="25%">25%</button>
+                        <button class="bet-quick-btn" data-action="50%">50%</button>
+                        <button class="bet-quick-btn" data-action="75%">75%</button>
+                        <button class="bet-quick-btn" data-action="max">MAX</button>
+                    </div>
+                    
+                    <div class="bet-input-group">
+                        <button class="btn-icon" id="decreaseBet">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" 
+                               id="betInput" 
+                               value="0" 
+                               min="0" 
+                               max="1000"
+                               class="bet-input">
+                        <button class="btn-icon" id="increaseBet">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="bet-actions">
+                        <button id="placeBetBtn" class="btn-bet">
+                            <i class="fas fa-hand-holding-usd"></i> Сделать ставку
+                        </button>
+                        <button id="clearBetBtn" class="btn-secondary">
+                            <i class="fas fa-times"></i> Очистить
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="start-round-section">
+                    <button id="startRoundBtn" class="btn-start" disabled>
+                        <i class="fas fa-play-circle"></i> Запустить раунд
+                    </button>
+                    <div class="start-hint" id="startHint">
+                        Сделайте ставку чтобы начать
+                    </div>
+                </div>
+            </div>
             
-            <!-- Статистика игроков -->
-            <div class="players-grid" id="playersGrid"></div>
+            <!-- Дополнительные действия -->
+            <div class="action-buttons">
+                <button id="showStatsBtn" class="btn-secondary">
+                    <i class="fas fa-chart-bar"></i> Статистика
+                </button>
+                <button id="supportMainBtn" class="btn-secondary">
+                    <i class="fas fa-question-circle"></i> Помощь
+                </button>
+            </div>
         </div>
 
-        <!-- Панель ставок -->
-        <div class="bet-panel">
-            <div class="bet-controls">
-                <div class="bet-amount-display" id="betAmountDisplay">0</div>
-                <div class="bet-buttons">
-                    <button class="bet-btn" data-amount="10">10</button>
-                    <button class="bet-btn" data-amount="50">50</button>
-                    <button class="bet-btn" data-amount="100">100</button>
-                    <button class="bet-btn" data-amount="500">500</button>
+        <!-- Колесо фортуны -->
+        <div id="screen-wheel" class="screen hidden">
+            <div class="wheel-container">
+                <div class="wheel-header">
+                    <h2><i class="fas fa-dharmachakra"></i> Колесо Фортуны</h2>
+                    <div class="wheel-timer" id="wheelTimer">
+                        <i class="fas fa-hourglass-half"></i> 06
+                    </div>
                 </div>
-                <input type="range" id="betSlider" min="0" max="1000" value="0" class="bet-slider">
-            </div>
-            <button id="placeBetBtn" class="btn-bet">Сделать ставку</button>
-            <button id="startRoundBtn" class="btn-start" disabled>Запустить раунд</button>
-        </div>
-
-        <!-- Кнопка смены режима -->
-        <button id="changeModeBtn" class="btn-secondary">Сменить режим</button>
-    </div>
-
-    <!-- Колесо фортуны -->
-    <div id="screen-wheel" class="center hidden">
-        <div class="wheel-container">
-            <div class="wheel-arrow">▼</div>
-            <div id="wheel" class="wheel">
-                <!-- Сектора будут созданы динамически -->
-            </div>
-            <div class="wheel-timer" id="wheelTimer">00:06</div>
-        </div>
-        <div class="current-bets" id="currentBets"></div>
-    </div>
-
-    <!-- Экран победы -->
-    <div id="screen-win" class="center hidden">
-        <div class="result-card win">
-            <div class="result-icon">🎉</div>
-            <h2>ПОБЕДА!</h2>
-            <div class="win-amount" id="winAmount">+0</div>
-            <div class="result-stats">
-                <div>Ваш баланс: <span id="newBalance">0</span></div>
-            </div>
-            <button id="playAgainBtn" class="btn-primary">Играть снова</button>
-        </div>
-    </div>
-
-    <!-- Экран проигрыша -->
-    <div id="screen-lose" class="center hidden">
-        <div class="result-card lose">
-            <div class="result-icon">😢</div>
-            <h2>ПРОИГРЫШ</h2>
-            <div class="lose-text">Повезёт в следующий раз!</div>
-            <div class="result-stats">
-                <div>Остаток баланса: <span id="loseBalance">0</span></div>
-            </div>
-            <button id="tryAgainBtn" class="btn-primary">Попробовать снова</button>
-            <button id="supportBtn" class="btn-secondary">Написать админу</button>
-        </div>
-    </div>
-
-    <!-- Админ панель -->
-    <div id="screen-admin" class="center hidden">
-        <div class="admin-panel">
-            <h2>👑 Админ панель</h2>
-            <div class="admin-section">
-                <h3>Статистика</h3>
-                <div id="adminStats"></div>
-            </div>
-            <div class="admin-section">
-                <h3>Управление игроками</h3>
-                <div id="playerList"></div>
-                <div class="admin-controls">
-                    <input type="text" id="playerIdInput" placeholder="ID игрока">
-                    <input type="number" id="addAmountInput" placeholder="Сумма" value="1000">
-                    <button id="addBalanceBtn">Добавить баланс</button>
+                
+                <div class="wheel-wrapper">
+                    <div class="wheel-arrow">
+                        <i class="fas fa-caret-down"></i>
+                    </div>
+                    <div id="wheel" class="wheel">
+                        <!-- Сектора создаются динамически -->
+                    </div>
+                </div>
+                
+                <div class="current-bets" id="currentBets">
+                    <h3><i class="fas fa-money-check-alt"></i> Текущие ставки</h3>
+                    <div class="bets-list" id="betsList">
+                        <!-- Ставки загружаются динамически -->
+                    </div>
+                </div>
+                
+                <div class="wheel-hint">
+                    <i class="fas fa-lightbulb"></i> Колесо определит победителя через несколько секунд
                 </div>
             </div>
-            <button id="backFromAdminBtn" class="btn-secondary">Назад</button>
         </div>
+
+        <!-- Экран победы -->
+        <div id="screen-win" class="screen hidden">
+            <div class="result-screen win">
+                <div class="result-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h1 class="result-title">🎉 ПОБЕДА! 🎉</h1>
+                
+                <div class="win-amount-container">
+                    <div class="win-label">Вы выиграли</div>
+                    <div class="win-amount" id="winAmount">+1,000</div>
+                    <div class="win-sub">в банке раунда</div>
+                </div>
+                
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Ваш новый баланс</div>
+                        <div class="stat-value" id="newBalance">2,000</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Ваш шанс был</div>
+                        <div class="stat-value" id="winChance">45%</div>
+                    </div>
+                </div>
+                
+                <div class="result-actions">
+                    <button id="playAgainBtn" class="btn-primary btn-large">
+                        <i class="fas fa-redo"></i> Играть снова
+                    </button>
+                    <button id="shareWinBtn" class="btn-secondary">
+                        <i class="fas fa-share"></i> Поделиться
+                    </button>
+                </div>
+                
+                <div class="result-message">
+                    <i class="fas fa-crown"></i> Отличная игра! Продолжайте в том же духе!
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран проигрыша -->
+        <div id="screen-lose" class="screen hidden">
+            <div class="result-screen lose">
+                <div class="result-icon">
+                    <i class="fas fa-cloud-rain"></i>
+                </div>
+                <h1 class="result-title">😢 Не повезло</h1>
+                
+                <div class="lose-message">
+                    <p>В этот раз удача не на вашей стороне</p>
+                    <p class="lose-amount">Вы потеряли: <span id="loseAmount">100</span></p>
+                </div>
+                
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Остаток баланса</div>
+                        <div class="stat-value" id="loseBalance">900</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Ваш шанс был</div>
+                        <div class="stat-value" id="loseChance">15%</div>
+                    </div>
+                </div>
+                
+                <div class="result-actions">
+                    <button id="tryAgainBtn" class="btn-primary btn-large">
+                        <i class="fas fa-fighter-jet"></i> Попробовать снова
+                    </button>
+                    <button id="supportBtn" class="btn-secondary">
+                        <i class="fas fa-life-ring"></i> Нужна помощь?
+                    </button>
+                </div>
+                
+                <div class="encouragement">
+                    <i class="fas fa-heart"></i> Не сдавайтесь! Удача обязательно улыбнется вам!
+                </div>
+            </div>
+        </div>
+
+        <!-- Админ панель -->
+        <div id="screen-admin" class="screen hidden">
+            <div class="admin-screen">
+                <div class="admin-header">
+                    <h2><i class="fas fa-crown"></i> Панель администратора</h2>
+                    <div class="admin-badge">
+                        <i class="fas fa-shield-alt"></i> Уровень доступа: Админ
+                    </div>
+                </div>
+                
+                <div class="admin-content">
+                    <div class="admin-stats-grid" id="adminStatsGrid">
+                        <!-- Статистика загружается динамически -->
+                    </div>
+                    
+                    <div class="admin-controls">
+                        <h3><i class="fas fa-users"></i> Управление игроками</h3>
+                        
+                        <div class="control-form">
+                            <div class="input-group">
+                                <label for="adminPlayerId">ID игрока:</label>
+                                <input type="text" 
+                                       id="adminPlayerId" 
+                                       placeholder="Введите ID игрока"
+                                       class="control-input">
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="adminAmount">Сумма:</label>
+                                <input type="number" 
+                                       id="adminAmount" 
+                                       placeholder="Сумма" 
+                                       value="1000"
+                                       class="control-input">
+                            </div>
+                            
+                            <div class="control-buttons">
+                                <button class="control-btn" data-action="add">
+                                    <i class="fas fa-plus"></i> Добавить баланс
+                                </button>
+                                <button class="control-btn" data-action="set">
+                                    <i class="fas fa-equals"></i> Установить баланс
+                                </button>
+                                <button class="control-btn" id="resetAllBtn">
+                                    <i class="fas fa-undo"></i> Сбросить все
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="players-list-section">
+                        <h3><i class="fas fa-list"></i> Список игроков</h3>
+                        <div class="players-table-container">
+                            <table class="players-table" id="playersTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Имя</th>
+                                        <th>Баланс</th>
+                                        <th>Статистика</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="playersTableBody">
+                                    <!-- Загружается динамически -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin-footer">
+                    <button id="backFromAdminBtn" class="btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Вернуться в игру
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран поддержки -->
+        <div id="screen-support" class="screen hidden">
+            <div class="support-screen">
+                <div class="support-header">
+                    <h2><i class="fas fa-life-ring"></i> Центр поддержки</h2>
+                    <p>Если у вас возникли проблемы или вопросы</p>
+                </div>
+                
+                <div class="support-content">
+                    <div class="support-info">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <div class="info-content">
+                                <h4>Закончилась валюта?</h4>
+                                <p>Напишите администратору чтобы пополнить баланс</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="info-content">
+                                <h4>Есть вопросы по игре?</h4>
+                                <p>Мы поможем разобраться с правилами</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-bug"></i>
+                            </div>
+                            <div class="info-content">
+                                <h4>Нашли ошибку?</h4>
+                                <p>Сообщите о проблеме для быстрого исправления</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="support-form">
+                        <h3><i class="fas fa-envelope"></i> Написать сообщение</h3>
+                        <textarea id="supportMessage" 
+                                  placeholder="Опишите вашу проблему или вопрос..."
+                                  rows="6"
+                                  class="support-textarea"></textarea>
+                        
+                        <div class="support-form-footer">
+                            <div class="character-count">
+                                Символов: <span id="charCount">0</span>/500
+                            </div>
+                            <button id="sendSupportBtn" class="btn-primary">
+                                <i class="fas fa-paper-plane"></i> Отправить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="support-footer">
+                    <button id="backFromSupportBtn" class="btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Вернуться в игру
+                    </button>
+                    <div class="support-note">
+                        <i class="fas fa-clock"></i> Обычно отвечаем в течение 15 минут
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран статистики -->
+        <div id="screen-stats" class="screen hidden">
+            <div class="stats-screen">
+                <div class="stats-header">
+                    <h2><i class="fas fa-chart-bar"></i> Ваша статистика</h2>
+                </div>
+                
+                <div class="personal-stats">
+                    <div class="stat-card-large">
+                        <div class="stat-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">Побед</div>
+                            <div class="stat-value-large" id="playerWins">0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card-large">
+                        <div class="stat-icon">
+                            <i class="fas fa-skull-crossbones"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">Поражений</div>
+                            <div class="stat-value-large" id="playerLosses">0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card-large">
+                        <div class="stat-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">Всего ставок</div>
+                            <div class="stat-value-large" id="playerTotalBets">0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card-large">
+                        <div class="stat-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">Выиграно</div>
+                            <div class="stat-value-large" id="playerTotalWon">0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-actions">
+                    <button id="backFromStatsBtn" class="btn-primary">
+                        <i class="fas fa-arrow-left"></i> Назад к игре
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Нижняя навигация -->
+        <div class="bottom-nav">
+            <div class="nav-container">
+                <button class="nav-btn active" data-screen="main">
+                    <i class="fas fa-home"></i>
+                    <span>Игра</span>
+                </button>
+                
+                <button class="nav-btn" data-screen="stats">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Статистика</span>
+                </button>
+                
+                <button class="nav-btn" id="quickStartBtn">
+                    <i class="fas fa-bolt"></i>
+                    <span>Быстро</span>
+                </button>
+                
+                <button class="nav-btn" data-screen="support">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Помощь</span>
+                </button>
+                
+                <button class="nav-btn" id="profileBtn">
+                    <i class="fas fa-user"></i>
+                    <span>Профиль</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Уведомления -->
+        <div id="notificationArea" class="notification-area"></div>
     </div>
 
-    <!-- Нижняя панель -->
-    <div class="footer-nav">
-        <div class="nav-item active" data-screen="main">
-            <div class="nav-icon">🎮</div>
-            <div class="nav-label">Игра</div>
-        </div>
-        <div class="nav-item" data-screen="stats">
-            <div class="nav-icon">📊</div>
-            <div class="nav-label">Статистика</div>
-        </div>
-        <div class="nav-item" data-screen="support">
-            <div class="nav-icon">💬</div>
-            <div class="nav-label">Поддержка</div>
-        </div>
-        <div class="nav-item" data-screen="profile">
-            <div class="nav-icon">👤</div>
-            <div class="nav-label">Профиль</div>
-        </div>
-    </div>
-
-    <!-- Поддержка -->
-    <div id="screen-support" class="center hidden">
-        <div class="support-panel">
-            <h2>💬 Поддержка</h2>
-            <p>Если у вас закончилась валюта, напишите администратору:</p>
-            <textarea id="supportMessage" placeholder="Ваше сообщение..." rows="4"></textarea>
-            <button id="sendSupportBtn" class="btn-primary">Отправить</button>
-            <button id="backFromSupportBtn" class="btn-secondary">Назад</button>
-        </div>
-    </div>
-
+    <!-- Подключение Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Основной скрипт -->
     <script src="app.js"></script>
 </body>
 </html>
