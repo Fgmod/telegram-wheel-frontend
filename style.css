@@ -6,10 +6,27 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+:root {
+    --tg-theme-bg-color: #0a0c14;
+    --tg-theme-text-color: #ffffff;
+    --tg-theme-hint-color: #a8a8a8;
+    --tg-theme-link-color: #2ea6ff;
+    --tg-theme-button-color: #2fff9d;
+    --tg-theme-button-text-color: #0b0e17;
+    --tg-theme-secondary-bg-color: #1b1f2e;
+    
+    --primary-color: #2fff9d;
+    --secondary-color: #2ea6ff;
+    --danger-color: #ff4d4d;
+    --warning-color: #ffd54a;
+    --success-color: #2fff9d;
+    --info-color: #4d7cff;
+}
+
 body {
     margin: 0;
-    background: linear-gradient(135deg, #0a0c14 0%, #1b1f2e 100%);
-    color: white;
+    background: var(--tg-theme-bg-color, #0a0c14);
+    color: var(--tg-theme-text-color, #ffffff);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
@@ -20,59 +37,112 @@ body {
     display: none !important;
 }
 
-/* Контейнер для всех экранов */
-.center {
+/* Загрузчик */
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--tg-theme-bg-color, #0a0c14);
     display: flex;
-    flex-direction: column;
     align-items: center;
-    padding: 20px;
-    max-width: 500px;
-    margin: 0 auto;
-    min-height: calc(100vh - 140px);
+    justify-content: center;
+    z-index: 1000;
+}
+
+.loader-content {
+    text-align: center;
+}
+
+.loader-wheel {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(47, 255, 157, 0.1);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+.loader-text {
+    color: var(--tg-theme-text-color);
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* Основной контейнер */
+.app-container {
+    position: relative;
+    min-height: 100vh;
+    padding-bottom: 70px;
 }
 
 /* Верхняя панель */
 .topbar {
-    padding: 15px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: rgba(18, 20, 32, 0.95);
     backdrop-filter: blur(10px);
-    border-bottom: 2px solid #2fff9d33;
-    position: sticky;
-    top: 0;
+    border-bottom: 1px solid rgba(47, 255, 157, 0.1);
     z-index: 100;
+    height: 60px;
 }
 
 .topbar-left {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
 }
 
 .logo {
     font-weight: 900;
-    font-size: 24px;
-    background: linear-gradient(90deg, #2fff9d, #2ea6ff);
+    font-size: 22px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: 1px;
 }
 
-.game-mode {
+.game-mode-badge {
     background: rgba(47, 255, 157, 0.1);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
     font-weight: 600;
-    border: 1px solid #2fff9d33;
+    border: 1px solid rgba(47, 255, 157, 0.2);
 }
 
 .topbar-right {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
+}
+
+/* Кнопка смены режима */
+.change-mode-btn {
+    background: rgba(47, 255, 157, 0.1);
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.3s ease;
+}
+
+.change-mode-btn:hover {
+    background: rgba(47, 255, 157, 0.2);
 }
 
 .balance-container {
@@ -80,127 +150,377 @@ body {
 }
 
 .balance-label {
-    font-size: 11px;
+    font-size: 10px;
     opacity: 0.7;
     margin-bottom: 2px;
 }
 
 .balance {
-    font-size: 18px;
-    color: #ffd54a;
+    font-size: 16px;
+    color: var(--warning-color);
     font-weight: 700;
 }
 
 .btn-icon {
     background: rgba(255, 255, 255, 0.1);
     border: none;
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     color: white;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
+/* Экран выбора режима */
+.screen {
+    position: fixed;
+    top: 60px;
+    bottom: 70px;
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 15px;
+    background: var(--tg-theme-bg-color, #0a0c14);
+    -webkit-overflow-scrolling: touch;
+}
+
+.screen-content {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.screen-title {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.screen-subtitle {
+    text-align: center;
+    opacity: 0.8;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
 /* Выбор режима */
 .mode-selector {
     display: flex;
+    flex-direction: column;
     gap: 15px;
-    margin: 30px 0;
-    width: 100%;
+    margin: 20px 0;
 }
 
-.mode-option {
-    flex: 1;
+.mode-card {
     background: rgba(26, 31, 46, 0.8);
-    border: 2px solid #2fff9d33;
+    border: 2px solid rgba(47, 255, 157, 0.1);
     border-radius: 15px;
     padding: 20px;
-    text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
+    position: relative;
 }
 
-.mode-option.active {
-    border-color: #2fff9d;
+.mode-card.active {
+    border-color: var(--primary-color);
     background: rgba(47, 255, 157, 0.1);
-    transform: translateY(-5px);
+}
+
+.mode-card:hover {
+    transform: translateY(-2px);
 }
 
 .mode-icon {
-    font-size: 40px;
+    font-size: 30px;
     margin-bottom: 10px;
+    text-align: center;
 }
 
-.mode-title {
+.mode-content h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.mode-content p {
+    font-size: 13px;
+    opacity: 0.8;
+    margin-bottom: 12px;
+}
+
+.mode-features {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.feature {
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.feature i {
+    color: var(--primary-color);
+}
+
+.mode-select {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 20px;
+    color: var(--primary-color);
+}
+
+.mode-select .far {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Кнопки */
+.btn-primary {
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    padding: 16px 24px;
+    border-radius: 15px;
     font-weight: 700;
     font-size: 16px;
+    color: var(--tg-theme-button-text-color);
+    cursor: pointer;
+    width: 100%;
+    margin: 10px 0;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(47, 255, 157, 0.3);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-large {
+    padding: 18px 30px;
+    font-size: 18px;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(47, 255, 157, 0.2);
+    color: white;
+    padding: 14px 20px;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    margin: 8px 0;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: rgba(47, 255, 157, 0.1);
+}
+
+.btn-bet {
+    background: linear-gradient(90deg, var(--warning-color), #ff9d2f);
+    border: none;
+    padding: 16px;
+    border-radius: 15px;
+    font-weight: 700;
+    font-size: 16px;
+    color: #0b0e17;
+    cursor: pointer;
+    width: 100%;
+    margin: 10px 0;
+}
+
+.btn-start {
+    background: linear-gradient(90deg, var(--danger-color), #ff2f9d);
+    border: none;
+    padding: 16px;
+    border-radius: 15px;
+    font-weight: 700;
+    font-size: 16px;
+    color: white;
+    cursor: pointer;
+    width: 100%;
+    margin: 10px 0;
+}
+
+.btn-start:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Статистика раунда */
+.round-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: rgba(26, 31, 46, 0.8);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-label {
+    font-size: 11px;
+    opacity: 0.7;
     margin-bottom: 5px;
 }
 
-.mode-desc {
-    font-size: 12px;
+.stat-value {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--warning-color);
+    margin: 5px 0;
+}
+
+.stat-sub {
+    font-size: 11px;
     opacity: 0.7;
 }
 
-/* Карта банка */
-.bank-card {
-    background: rgba(26, 31, 46, 0.9);
-    border-radius: 20px;
-    padding: 25px;
-    width: 100%;
-    margin-bottom: 20px;
-    border: 2px solid #2fff9d33;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+/* Секция PvP готовности */
+.pvp-ready-section {
+    background: rgba(47, 255, 157, 0.1);
+    border: 2px solid var(--primary-color);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px 0;
+    text-align: center;
 }
 
-.bank-header {
+.ready-players {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 15px 0;
+    flex-wrap: wrap;
+}
+
+.player-ready-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.ready-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #666;
+}
+
+.ready-dot.ready {
+    background: var(--primary-color);
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+.ready-dot.waiting {
+    background: var(--warning-color);
+    animation: pulse 1.5s infinite;
+}
+
+.ready-text {
+    font-size: 11px;
+    opacity: 0.8;
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ready-btn {
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-weight: 700;
+    color: var(--tg-theme-button-text-color);
+    cursor: pointer;
+    margin: 10px;
+    transition: all 0.3s ease;
+}
+
+.ready-btn.ready {
+    background: linear-gradient(90deg, var(--warning-color), #ff9d2f);
+}
+
+.ready-message {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.waiting-message {
+    opacity: 0.8;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+/* Игроки онлайн */
+.players-section {
+    background: rgba(26, 31, 46, 0.8);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
 }
 
-.bank-title {
-    font-size: 14px;
-    opacity: 0.8;
+.section-header h3 {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.bank-timer {
-    font-size: 14px;
-    color: #2fff9d;
+.section-badge {
+    background: rgba(47, 255, 157, 0.1);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
     font-weight: 600;
 }
 
-.bank-amount {
-    font-size: 36px;
-    font-weight: 900;
-    color: #ffd54a;
-    text-align: center;
-    margin: 10px 0;
-}
-
-/* Сетка игроков */
 .players-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 10px;
-    margin-top: 20px;
 }
 
 .player-card {
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
+    border-radius: 10px;
     padding: 12px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease;
 }
 
 .player-card.active {
-    border-color: #2fff9d;
+    border-color: var(--primary-color);
     background: rgba(47, 255, 157, 0.05);
 }
 
@@ -215,62 +535,40 @@ body {
 
 .player-bet {
     font-size: 14px;
-    color: #2ea6ff;
+    color: var(--secondary-color);
     font-weight: 700;
 }
 
 .player-chance {
     font-size: 11px;
-    color: #ffd54a;
+    color: var(--warning-color);
     opacity: 0.8;
 }
 
+.player-balance {
+    font-size: 11px;
+    opacity: 0.7;
+    margin-top: 3px;
+}
+
 /* Панель ставок */
-.bet-panel {
+.bet-section {
     background: rgba(18, 20, 32, 0.8);
-    border-radius: 20px;
-    padding: 25px;
-    width: 100%;
-    margin-top: 20px;
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 15px;
 }
 
-.bet-controls {
-    margin-bottom: 20px;
-}
-
-.bet-amount-display {
-    font-size: 32px;
+.current-bet {
+    font-size: 24px;
     font-weight: 900;
-    color: #2fff9d;
+    color: var(--primary-color);
     text-align: center;
-    margin: 15px 0;
-    padding: 10px;
-    background: rgba(47, 255, 157, 0.1);
-    border-radius: 10px;
-    border: 2px solid #2fff9d33;
+    margin: 10px 0;
 }
 
-.bet-buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+.bet-slider-container {
     margin: 20px 0;
-}
-
-.bet-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 12px;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.bet-btn:hover {
-    background: rgba(47, 255, 157, 0.2);
-    border-color: #2fff9d;
 }
 
 .bet-slider {
@@ -287,88 +585,127 @@ body {
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: #2fff9d;
+    background: var(--primary-color);
     cursor: pointer;
-    box-shadow: 0 0 10px #2fff9d;
+    box-shadow: 0 0 10px var(--primary-color);
 }
 
-/* Кнопки */
-.btn-primary {
-    background: linear-gradient(90deg, #2fff9d, #2ea6ff);
-    border: none;
-    padding: 18px 30px;
-    border-radius: 15px;
-    font-weight: 800;
-    font-size: 16px;
-    color: #0b0e17;
-    box-shadow: 0 10px 20px rgba(47, 255, 157, 0.3);
-    cursor: pointer;
-    width: 100%;
-    margin: 10px 0;
-    transition: all 0.3s ease;
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 10px;
+    opacity: 0.7;
 }
 
-.btn-primary:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+.bet-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin: 15px 0;
 }
 
-.btn-secondary {
+.bet-quick-btn {
     background: rgba(255, 255, 255, 0.1);
-    border: 2px solid #2fff9d33;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
-    padding: 15px 25px;
-    border-radius: 15px;
-    font-weight: 700;
-    font-size: 15px;
+    padding: 10px 5px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 12px;
     cursor: pointer;
-    width: 100%;
-    margin: 5px 0;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
-.btn-bet {
-    background: linear-gradient(90deg, #ffd54a, #ff9d2f);
-    border: none;
-    padding: 18px;
-    border-radius: 15px;
-    font-weight: 800;
-    font-size: 16px;
-    color: #0b0e17;
-    cursor: pointer;
-    width: 100%;
-    margin: 10px 0;
+.bet-quick-btn:hover {
+    background: rgba(47, 255, 157, 0.2);
+    border-color: var(--primary-color);
 }
 
-.btn-start {
-    background: linear-gradient(90deg, #ff4d4d, #ff2f9d);
-    border: none;
-    padding: 18px;
-    border-radius: 15px;
-    font-weight: 800;
-    font-size: 16px;
+.bet-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.bet-input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(47, 255, 157, 0.2);
+    background: rgba(255, 255, 255, 0.1);
     color: white;
-    cursor: pointer;
-    width: 100%;
-    margin: 10px 0;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.bet-actions {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.start-round-section {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.start-hint {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 8px;
+}
+
+/* Дополнительные кнопки */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.action-buttons .btn-secondary {
+    flex: 1;
 }
 
 /* Колесо фортуны */
 .wheel-container {
+    text-align: center;
+}
+
+.wheel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.wheel-timer {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-color);
+    background: rgba(47, 255, 157, 0.1);
+    padding: 8px 15px;
+    border-radius: 20px;
+}
+
+.wheel-wrapper {
     position: relative;
-    width: 300px;
-    height: 300px;
-    margin: 40px auto;
+    width: 280px;
+    height: 280px;
+    margin: 20px auto;
 }
 
 .wheel {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    border: 8px solid #2fff9d;
+    border: 8px solid var(--primary-color);
     position: relative;
     overflow: hidden;
     box-shadow: 0 0 40px rgba(47, 255, 157, 0.4);
+    transition: transform 6s cubic-bezier(0.1, 0.7, 0.2, 1);
 }
 
 .wheel-sector {
@@ -381,9 +718,21 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
     color: white;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    overflow: hidden;
+}
+
+.sector-label {
+    transform: rotate(45deg);
+    font-size: 10px;
+    text-align: center;
+    padding: 5px;
+    white-space: nowrap;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .wheel-arrow {
@@ -392,49 +741,68 @@ body {
     left: 50%;
     transform: translateX(-50%);
     font-size: 40px;
-    color: #ff4d4d;
+    color: var(--danger-color);
     z-index: 10;
-    filter: drop-shadow(0 0 10px #ff4d4d);
+    filter: drop-shadow(0 0 10px var(--danger-color));
 }
 
-.wheel-timer {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 32px;
-    font-weight: 900;
-    color: white;
-    background: rgba(0, 0, 0, 0.6);
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
+.current-bets {
+    background: rgba(26, 31, 46, 0.8);
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.current-bets h3 {
+    margin-bottom: 15px;
+    font-size: 16px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    border: 4px solid #2fff9d;
+    gap: 8px;
 }
 
-/* Карты результатов */
-.result-card {
-    background: rgba(26, 31, 46, 0.95);
-    border-radius: 25px;
-    padding: 40px 30px;
+.bets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bet-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.bet-player {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.bet-amount {
+    font-size: 14px;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.wheel-hint {
     text-align: center;
-    width: 100%;
+    opacity: 0.8;
+    font-size: 13px;
+    margin-top: 20px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+/* Экран победы/проигрыша */
+.result-screen {
     max-width: 400px;
-    border: 3px solid;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-}
-
-.result-card.win {
-    border-color: #2fff9d;
-    background: linear-gradient(135deg, rgba(47, 255, 157, 0.1), rgba(26, 31, 46, 0.9));
-}
-
-.result-card.lose {
-    border-color: #ff4d4d;
-    background: linear-gradient(135deg, rgba(255, 77, 77, 0.1), rgba(26, 31, 46, 0.9));
+    margin: 0 auto;
+    text-align: center;
+    padding: 30px 20px;
 }
 
 .result-icon {
@@ -442,197 +810,514 @@ body {
     margin-bottom: 20px;
 }
 
-.win-amount {
-    font-size: 48px;
-    font-weight: 900;
-    color: #2fff9d;
-    margin: 20px 0;
-    text-shadow: 0 0 20px rgba(47, 255, 157, 0.5);
+.result-title {
+    font-size: 28px;
+    margin-bottom: 20px;
 }
 
-.lose-text {
-    font-size: 18px;
-    opacity: 0.8;
+.win-amount-container {
+    background: rgba(47, 255, 157, 0.1);
+    border: 2px solid var(--primary-color);
+    border-radius: 15px;
+    padding: 20px;
     margin: 20px 0;
+}
+
+.win-label {
+    font-size: 14px;
+    opacity: 0.8;
+    margin-bottom: 5px;
+}
+
+.win-amount {
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--primary-color);
+    margin: 10px 0;
+}
+
+.win-sub {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.lose-message {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 20px 0;
+}
+
+.lose-amount {
+    font-size: 20px;
+    color: var(--danger-color);
+    font-weight: 700;
+    margin-top: 10px;
 }
 
 .result-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.stat-item {
     background: rgba(255, 255, 255, 0.05);
     padding: 15px;
     border-radius: 10px;
+}
+
+.stat-item .stat-label {
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.stat-item .stat-value {
+    font-size: 18px;
+    color: var(--warning-color);
+}
+
+.result-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     margin: 20px 0;
+}
+
+.encouragement {
+    font-size: 13px;
+    opacity: 0.8;
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+/* Админ панель */
+.admin-screen {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.admin-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.admin-header h2 {
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.admin-badge {
+    background: rgba(47, 255, 157, 0.1);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--primary-color);
+    display: inline-block;
+}
+
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.admin-stat-card {
+    background: rgba(26, 31, 46, 0.8);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-stat-value {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin: 5px 0;
+}
+
+.admin-stat-label {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+.admin-controls {
+    background: rgba(26, 31, 46, 0.8);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.admin-controls h3 {
+    margin-bottom: 15px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.control-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input-group label {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.control-input {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(47, 255, 157, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
     font-size: 14px;
 }
 
+.control-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.control-btn {
+    background: rgba(47, 255, 157, 0.1);
+    border: 1px solid var(--primary-color);
+    color: white;
+    padding: 12px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.control-btn:hover {
+    background: rgba(47, 255, 157, 0.2);
+}
+
+.players-list-section {
+    background: rgba(26, 31, 46, 0.8);
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.players-list-section h3 {
+    margin-bottom: 15px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.players-table-container {
+    overflow-x: auto;
+}
+
+.players-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.players-table th {
+    background: rgba(47, 255, 157, 0.1);
+    padding: 10px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid rgba(47, 255, 157, 0.2);
+}
+
+.players-table td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.players-table tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-footer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Поддержка */
+.support-screen {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.support-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.support-header h2 {
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.support-header p {
+    opacity: 0.8;
+    font-size: 14px;
+}
+
+.support-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.info-card {
+    background: rgba(26, 31, 46, 0.8);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-icon {
+    font-size: 24px;
+    color: var(--primary-color);
+}
+
+.info-content h4 {
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+
+.info-content p {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.support-form {
+    background: rgba(26, 31, 46, 0.8);
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.support-form h3 {
+    margin-bottom: 15px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.support-textarea {
+    width: 100%;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(47, 255, 157, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.support-form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.character-count {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.support-footer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.support-note {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+/* Статистика */
+.stats-screen {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.stats-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.stats-header h2 {
+    font-size: 24px;
+}
+
+.personal-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-card-large {
+    background: rgba(26, 31, 46, 0.8);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-icon {
+    font-size: 30px;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+.stat-content .stat-label {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-bottom: 8px;
+}
+
+.stat-value-large {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--warning-color);
+}
+
 /* Нижняя навигация */
-.footer-nav {
+.bottom-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     background: rgba(18, 20, 32, 0.95);
     backdrop-filter: blur(10px);
-    border-top: 1px solid #2fff9d33;
-    display: flex;
-    justify-content: space-around;
-    padding: 12px 0;
+    border-top: 1px solid rgba(47, 255, 157, 0.1);
+    padding: 10px 0;
     z-index: 100;
+    height: 70px;
 }
 
-.nav-item {
+.nav-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.nav-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
     cursor: pointer;
-    opacity: 0.6;
-    transition: all 0.3s ease;
-    padding: 5px 15px;
+    padding: 8px 12px;
     border-radius: 10px;
+    transition: all 0.3s ease;
+    flex: 1;
+    max-width: 80px;
 }
 
-.nav-item.active {
-    opacity: 1;
+.nav-btn.active {
+    color: var(--primary-color);
     background: rgba(47, 255, 157, 0.1);
 }
 
-.nav-icon {
-    font-size: 20px;
+.nav-btn i {
+    font-size: 18px;
 }
 
-.nav-label {
-    font-size: 11px;
+.nav-btn span {
+    font-size: 10px;
     font-weight: 600;
 }
 
-/* Админ панель и поддержка */
-.admin-panel,
-.support-panel {
+#quickStartBtn {
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    color: var(--tg-theme-button-text-color);
+    font-weight: 700;
+    padding: 10px;
+    border-radius: 12px;
+    transform: translateY(-5px);
+}
+
+/* Уведомления */
+.notification-area {
+    position: fixed;
+    top: 70px;
+    right: 15px;
+    z-index: 1000;
+}
+
+.notification {
     background: rgba(26, 31, 46, 0.95);
-    border-radius: 20px;
-    padding: 30px;
-    width: 100%;
-    max-width: 500px;
-    border: 2px solid #2fff9d33;
-}
-
-.admin-section {
-    margin: 20px 0;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
-}
-
-.admin-controls {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    flex-wrap: wrap;
-}
-
-.admin-controls input {
-    flex: 1;
-    min-width: 120px;
-    padding: 12px;
+    border-left: 4px solid var(--primary-color);
     border-radius: 10px;
-    border: 1px solid #2fff9d33;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-}
-
-.support-panel textarea {
-    width: 100%;
     padding: 15px;
-    border-radius: 10px;
-    border: 1px solid #2fff9d33;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    margin: 15px 0;
-    font-family: inherit;
-    resize: vertical;
+    margin-bottom: 10px;
+    max-width: 300px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease;
+}
+
+.notification.success {
+    border-left-color: var(--success-color);
+}
+
+.notification.error {
+    border-left-color: var(--danger-color);
+}
+
+.notification.info {
+    border-left-color: var(--info-color);
 }
 
 /* Анимации */
 @keyframes spin {
     0% { transform: rotate(0deg); }
-    100% { transform: rotate(3600deg); }
-}
-
-.spin {
-    animation: spin 5s cubic-bezier(0.1, 0.7, 0.2, 1) forwards;
+    100% { transform: rotate(360deg); }
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-.pulse {
-    animation: pulse 2s infinite;
-}
-
-/* Адаптивность */
-@media (max-width: 480px) {
-    .center {
-        padding: 15px;
-    }
-    
-    .wheel-container {
-        width: 280px;
-        height: 280px;
-    }
-    
-    .bank-amount {
-        font-size: 32px;
-    }
-    
-    .bet-buttons {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .mode-selector {
-        flex-direction: column;
-    }
-}
-
-@media (min-width: 768px) {
-    .center {
-        padding: 30px;
-    }
-    
-    .wheel-container {
-        width: 350px;
-        height: 350px;
-    }
-}
-
-/* Прокрутка */
-::-webkit-scrollbar {
-    width: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-::-webkit-scrollbar-thumb {
-    background: #2fff9d;
-    border-radius: 3px;
-}
-
-/* Уведомления */
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: rgba(47, 255, 157, 0.9);
-    color: #0b0e17;
-    padding: 15px 25px;
-    border-radius: 10px;
-    font-weight: 600;
-    z-index: 1000;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    animation: slideIn 0.3s ease;
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
 
 @keyframes slideIn {
@@ -646,67 +1331,96 @@ body {
     }
 }
 
-/* Фронтенд стили - полная версия в отдельном файле */
-/* Здесь только ключевые изменения для адаптации */
-
-/* Добавьте эти стили к существующим */
-
-/* Адаптация для разных устройств */
+/* Адаптация для телефонов */
 @media (max-width: 480px) {
-    .container {
-        padding: 10px;
+    .screen {
+        padding: 12px;
     }
     
-    .wheel-container {
-        width: 280px;
-        height: 280px;
+    .wheel-wrapper {
+        width: 250px;
+        height: 250px;
     }
     
-    .topbar {
-        padding: 12px 15px;
+    .wheel {
+        border-width: 6px;
+    }
+    
+    .round-stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+    
+    .stat-card {
+        padding: 12px;
+    }
+    
+    .stat-value {
+        font-size: 18px;
+    }
+    
+    .players-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
 }
 
-@media (min-width: 768px) {
-    .container {
-        max-width: 500px;
-        margin: 0 auto;
+@media (max-height: 700px) {
+    .screen {
+        top: 60px;
+        bottom: 60px;
+    }
+    
+    .bottom-nav {
+        height: 60px;
+    }
+    
+    .nav-btn {
+        padding: 6px 8px;
+    }
+    
+    .nav-btn i {
+        font-size: 16px;
+    }
+    
+    .nav-btn span {
+        font-size: 9px;
     }
 }
 
-/* Телеграм специфичные стили */
-.telegram-webapp {
-    background: transparent !important;
+/* Предотвращение выделения текста */
+* {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
-/* Анимации */
-@keyframes telegramFadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Разрешить выделение в инпутах */
+input, textarea {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
 
-.telegram-content {
-    animation: telegramFadeIn 0.3s ease;
+/* Плавная прокрутка */
+html {
+    scroll-behavior: smooth;
 }
 
-/* Переменные для цветов Telegram */
-:root {
-    --tg-theme-bg-color: #0a0c14;
-    --tg-theme-text-color: #ffffff;
-    --tg-theme-hint-color: #a8a8a8;
-    --tg-theme-link-color: #2ea6ff;
-    --tg-theme-button-color: #2fff9d;
-    --tg-theme-button-text-color: #0b0e17;
-    --tg-theme-secondary-bg-color: #1b1f2e;
+/* Фикс для iOS */
+input, textarea, button {
+    -webkit-appearance: none;
+    border-radius: 0;
 }
 
-/* Использование переменных Telegram */
-body {
-    background: var(--tg-theme-bg-color);
-    color: var(--tg-theme-text-color);
+/* Убираем стрелки у input[type="number"] */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
-.btn-primary {
-    background: var(--tg-theme-button-color);
-    color: var(--tg-theme-button-text-color);
+input[type="number"] {
+    -moz-appearance: textfield;
 }
