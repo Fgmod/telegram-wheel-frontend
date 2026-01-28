@@ -683,6 +683,21 @@ function handleInit(data) {
     gameMode = data.gameMode || 'bots';
     playerId = data.playerId || user.id;
     
+    // Сохраняем статистику если она пришла с сервера
+    if (data.stats) {
+        playerStats = {
+            wins: data.stats.totalWins || 0,
+            losses: data.stats.totalLosses || 0,
+            totalBet: data.stats.totalBets || 0,
+            totalWon: data.stats.totalWon || 0,
+            gamesPlayed: data.stats.gamesPlayed || 0,
+            joinDate: data.stats.joinDate || new Date().toISOString()
+        };
+        
+        // Обновляем отображение статистики
+        updateStatsDisplay();
+    }
+    
     updateUI();
     
     // Показываем админ кнопку если админ
@@ -984,7 +999,7 @@ function startWheelAnimation(time, sectors) {
     // Создаем динамические сектора
     createWheelSectors(sectors);
     
-    // Показываем текущие ставки
+    // Показываем текущие ставки с эмодзи
     updateBetsList(sectors);
     
     // Таймер
@@ -993,6 +1008,13 @@ function startWheelAnimation(time, sectors) {
     const timer = setInterval(() => {
         if (remaining >= 0) {
             timerEl.innerHTML = `<i class="fas fa-hourglass-half"></i> ${remaining.toString().padStart(2, '0')}`;
+            
+            // Анимация пульсации в последние 3 секунды
+            if (remaining <= 3) {
+                timerEl.style.animation = 'pulse 0.5s infinite';
+                timerEl.style.color = 'var(--danger-color)';
+            }
+            
             remaining--;
         } else {
             clearInterval(timer);
@@ -1000,9 +1022,26 @@ function startWheelAnimation(time, sectors) {
             // Запускаем анимацию колеса
             const wheel = document.getElementById('wheel');
             if (wheel) {
-                wheel.style.transition = 'transform 6s cubic-bezier(0.1, 0.7, 0.2, 1)';
-                wheel.style.transform = 'rotate(3600deg)';
+                // Случайный финальный угол (несколько полных оборотов + случайный сектор)
+                const spins = 5; // Количество полных оборотов
+                const randomSector = Math.random() * 360;
+                const finalAngle = (spins * 360) + randomSector;
+                
+                // Запускаем анимацию с эффектом замедления
+                wheel.style.transition = 'transform 5s cubic-bezier(0.1, 0.7, 0.2, 1)';
+                wheel.style.transform = `rotate(${finalAngle}deg)`;
+                
+                // Добавляем эффект тряски для стрелки
+                const arrow = document.querySelector('.wheel-arrow');
+                if (arrow) {
+                    arrow.style.animation = 'shake 0.5s 10';
+                }
             }
+            
+            // Показываем сообщение
+            setTimeout(() => {
+                document.querySelector('.wheel-hint').textContent = '🎰 Определяем победителя...';
+            }, 2000);
         }
     }, 1000);
 }
@@ -1013,14 +1052,24 @@ function createWheelSectors(sectors) {
     
     wheel.innerHTML = '';
     wheel.style.transform = 'rotate(0deg)';
+    wheel.classList.remove('wheel-spinning');
+    
+    // Эмодзи для игроков
+    const playerEmojis = {
+        'bot': '🤖',
+        'player': '👤',
+        'default': '🎯',
+        'admin': '👑',
+        'vip': '⭐'
+    };
     
     if (!sectors || sectors.length === 0) {
         sectors = [
-            { name: "Вы", color: "#2fff9d", size: 30 },
-            { name: "BOT_1", color: "#ff4d4d", size: 25 },
-            { name: "BOT_2", color: "#4d7cff", size: 20 },
-            { name: "BOT_3", color: "#ffd54a", size: 15 },
-            { name: "BOT_4", color: "#9d2fff", size: 10 }
+            { name: "Вы", color: "#2fff9d", size: 30, playerId: user.id, isBot: false },
+            { name: "BOT_1", color: "#ff4d4d", size: 25, playerId: 'bot_1', isBot: true },
+            { name: "BOT_2", color: "#4d7cff", size: 20, playerId: 'bot_2', isBot: true },
+            { name: "BOT_3", color: "#ffd54a", size: 15, playerId: 'bot_3', isBot: true },
+            { name: "BOT_4", color: "#9d2fff", size: 10, playerId: 'bot_4', isBot: true }
         ];
     }
     
@@ -1032,87 +1081,178 @@ function createWheelSectors(sectors) {
         sectorEl.style.background = sector.color || '#666';
         sectorEl.style.transform = `rotate(${currentAngle}deg)`;
         
+        const sectorContent = document.createElement('div');
+        sectorContent.className = 'sector-content';
+        
+        // Добавляем эмодзи в зависимости от типа игрока
+        const emoji = document.createElement('div');
+        emoji.className = 'sector-emoji';
+        
+        if (sector.playerId === user.id) {
+            emoji.textContent = '👑'; // Эмодзи для текущего игрока
+        } else if (sector.isBot) {
+            emoji.textContent = '🤖'; // Эмодзи для бота
+        } else {
+            // Случайный эмодзи для других игроков
+            const randomEmojis = ['👤', '🎮', '💎', '🚀', '⭐', '👽', '🦄', '🐉'];
+            emoji.textContent = randomEmojis[Math.floor(Math.random() * randomEmojis.length)];
+        }
+        
         const label = document.createElement('div');
         label.className = 'sector-label';
-        label.textContent = sector.name || `Сектор ${index + 1}`;
-        sectorEl.appendChild(label);
+        label.textContent = sector.name || `Игрок ${index + 1}`;
+        
+        const percentage = document.createElement('div');
+        percentage.className = 'sector-percentage';
+        percentage.textContent = `${Math.round(sector.size)}%`;
+        
+        sectorContent.appendChild(emoji);
+        sectorContent.appendChild(label);
+        sectorContent.appendChild(percentage);
+        sectorEl.appendChild(sectorContent);
         
         wheel.appendChild(sectorEl);
         currentAngle += (sector.size / 100) * 360;
     });
     
-    // Добавляем стрелку если ее нет
-    let arrow = document.querySelector('.wheel-arrow');
-    if (!arrow) {
-        arrow = document.createElement('div');
-        arrow.className = 'wheel-arrow';
-        arrow.innerHTML = '<i class="fas fa-caret-down"></i>';
-        wheel.parentElement.appendChild(arrow);
-    }
+    // Добавляем центр колеса
+    const center = document.createElement('div');
+    center.className = 'wheel-center';
+    center.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 60px;
+        height: 60px;
+        background: var(--tg-theme-bg-color);
+        border-radius: 50%;
+        border: 5px solid var(--primary-color);
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: var(--primary-color);
+    `;
+    center.innerHTML = '<i class="fas fa-dharmachakra"></i>';
+    wheel.appendChild(center);
+}
+function spinWheel(finalAngle) {
+    const wheel = document.getElementById('wheel');
+    if (!wheel) return;
+    
+    // Снимаем предыдущую анимацию
+    wheel.classList.remove('wheel-spinning');
+    
+    // Даем время для сброса
+    setTimeout(() => {
+        // Добавляем класс с анимацией
+        wheel.classList.add('wheel-spinning');
+        
+        // Устанавливаем конечный угол
+        setTimeout(() => {
+            wheel.style.transform = `rotate(${finalAngle}deg)`;
+            wheel.classList.remove('wheel-spinning');
+        }, 100);
+    }, 50);
 }
 
+// Добавим функцию обновления списка ставок с эмодзи
 function updateBetsList(sectors) {
     const betsList = document.getElementById('betsList');
     if (!betsList || !sectors) return;
     
-    betsList.innerHTML = sectors.map(sector => `
-        <div class="bet-item">
-            <span class="bet-player">${sector.name}</span>
-            <span class="bet-amount" style="color: ${sector.color}">${Math.round(sector.size)}%</span>
-        </div>
-    `).join('');
+    betsList.innerHTML = sectors.map(sector => {
+        // Определяем эмодзи для игрока
+        let emoji = '👤';
+        if (sector.playerId === user.id) {
+            emoji = '👑';
+        } else if (sector.isBot) {
+            emoji = '🤖';
+        } else if (sector.playerId && sector.playerId.includes('bot')) {
+            emoji = '🤖';
+        } else if (sector.playerId && sector.playerId.includes('admin')) {
+            emoji = '👑';
+        }
+        
+        return `
+            <div class="bet-item">
+                <div class="bet-player-info">
+                    <span class="bet-emoji">${emoji}</span>
+                    <span class="bet-player">${sector.name}</span>
+                </div>
+                <span class="bet-amount" style="color: ${sector.color}">
+                    ${Math.round(sector.size)}%
+                </span>
+            </div>
+        `;
+    }).join('');
 }
 
 function handleRoundEnd(data) {
     console.log('🏁 Round ended:', data.winnerId === playerId ? 'WIN' : 'LOSE');
     
-    if (data.winnerId === playerId) {
+    const won = data.winnerId === playerId;
+    
+    if (won) {
         currentBalance += data.winAmount || 0;
         
         document.getElementById('winAmount').textContent = `+${data.winAmount || 0}`;
         document.getElementById('newBalance').textContent = currentBalance;
         
-        // Обновляем шанс
-        const winChance = document.getElementById('winChance');
-        if (winChance) {
-            const playerData = data.stats?.playerStats?.[playerId];
-            if (playerData && playerData.wins && playerData.losses) {
-                const total = playerData.wins + playerData.losses;
-                winChance.textContent = `${Math.round((playerData.wins / total) * 100)}%`;
-            }
-        }
+        // Обновляем статистику
+        playerStats.wins = (playerStats.wins || 0) + 1;
+        playerStats.totalWon = (playerStats.totalWon || 0) + (data.winAmount || 0);
+        playerStats.totalBet = (playerStats.totalBet || 0) + currentBet;
+        playerStats.gamesPlayed = (playerStats.gamesPlayed || 0) + 1;
         
         showScreen('win');
-        
-        // Обновляем статистику
-        if (data.stats?.playerStats?.[playerId]) {
-            playerStats = data.stats.playerStats[playerId];
-            updateStatsDisplay();
-        }
-        
         showNotification(`🎉 Поздравляем! Вы выиграли ${data.winAmount}!`, 'success');
     } else {
+        playerStats.losses = (playerStats.losses || 0) + 1;
+        playerStats.totalBet = (playerStats.totalBet || 0) + currentBet;
+        playerStats.gamesPlayed = (playerStats.gamesPlayed || 0) + 1;
+        
         document.getElementById('loseBalance').textContent = currentBalance;
         document.getElementById('loseAmount').textContent = currentBet;
-        
-        // Обновляем шанс
-        const loseChance = document.getElementById('loseChance');
-        if (loseChance) {
-            const playerData = data.stats?.playerStats?.[playerId];
-            if (playerData && playerData.wins && playerData.losses) {
-                const total = playerData.wins + playerData.losses;
-                loseChance.textContent = `${Math.round((playerData.losses / total) * 100)}%`;
-            }
-        }
         
         showScreen('lose');
         showNotification('Повезет в следующий раз!', 'info');
     }
     
+    // Обновляем отображение статистики
+    updateStatsDisplay();
+    
     // Обновляем UI
     updateUI();
     currentBet = 0;
     setBet(0);
+}
+
+// Добавим функцию для загрузки статистики с сервера
+async function loadUserStats() {
+    if (!serverOnline) return;
+    
+    try {
+        const response = await fetch(`/api/user/${playerId}`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.user) {
+                playerStats = {
+                    wins: data.user.totalWins || 0,
+                    losses: data.user.totalLosses || 0,
+                    totalBet: data.user.totalBets || 0,
+                    totalWon: data.user.totalWon || 0,
+                    gamesPlayed: data.user.gamesPlayed || 0,
+                    joinDate: data.user.joinDate || new Date().toISOString()
+                };
+                updateStatsDisplay();
+            }
+        }
+    } catch (error) {
+        console.error('Error loading user stats:', error);
+    }
 }
 
 function showScreen(screenName) {
@@ -1449,6 +1589,38 @@ function updateStatsDisplay() {
     document.getElementById('playerLosses').textContent = playerStats.losses || 0;
     document.getElementById('playerTotalBets').textContent = playerStats.totalBet || 0;
     document.getElementById('playerTotalWon').textContent = playerStats.totalWon || 0;
+    
+    // Добавим отображение дополнительной статистики если есть
+    const statsScreen = document.getElementById('screen-stats');
+    if (statsScreen) {
+        const additionalStats = `
+            <div class="additional-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Всего игр</div>
+                    <div class="stat-value">${playerStats.gamesPlayed || 0}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Дата регистрации</div>
+                    <div class="stat-value">${playerStats.joinDate ? new Date(playerStats.joinDate).toLocaleDateString() : 'Сегодня'}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Процент побед</div>
+                    <div class="stat-value">
+                        ${playerStats.gamesPlayed > 0 ? 
+                            Math.round(((playerStats.wins || 0) / playerStats.gamesPlayed) * 100) : 0}%
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Добавляем дополнительную статистику если её ещё нет
+        if (!document.querySelector('.additional-stats')) {
+            const statsActions = document.querySelector('.stats-actions');
+            if (statsActions) {
+                statsActions.insertAdjacentHTML('beforebegin', additionalStats);
+            }
+        }
+    }
 }
 
 function showNotification(message, type = 'info') {
@@ -1514,7 +1686,18 @@ window.addEventListener('beforeunload', () => {
         clearInterval(demoInterval);
     }
 });
-
+// Вызываем загрузку статистики при инициализации
+document.addEventListener('DOMContentLoaded', () => {
+    initApp();
+    initEventListeners();
+    
+    // Загружаем статистику если пользователь уже был авторизован
+    setTimeout(() => {
+        if (playerId) {
+            loadUserStats();
+        }
+    }, 1000);
+});
 // Экспортируем функции для тестирования
 if (isDevelopmentMode) {
     window.demoMode = {
